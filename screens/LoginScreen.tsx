@@ -12,8 +12,13 @@ import InputField from "../components/InputField";
 import CustomButton from "../components/CustomButton";
 import Colors from "../constants/Colors";
 import useFetch from "../hooks/useFetch";
+import { AuthContex } from "../context/AuthContext";
 
 const LoginScreen = ({ navigation }: any) => {
+
+    const { login }:any = useContext(AuthContex);
+
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { data, isLoading, error, refetch }: any = useFetch({ method: "POST", endpoint: "auth/login", query: { username: email, password: password } });
@@ -50,6 +55,7 @@ const LoginScreen = ({ navigation }: any) => {
                     console.error("A szükséges cookie-k nincsenek jelen a válaszban.");
                 }
                 console.log("Sikeres bejelentkezés!");
+                login(await AsyncStorage.getItem('authToken'), await AsyncStorage.getItem('deviceId'));
             }
         } catch (err) {
             console.log(err);
