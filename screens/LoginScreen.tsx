@@ -29,32 +29,40 @@ const LoginScreen = ({ navigation }: any) => {
             await AsyncStorage.removeItem("authToken");
             await AsyncStorage.removeItem("deviceId");
 
+            // Megy a post.
             await refetch();
 
+            // Ha a lekérdezés nem sikerült. (status=failed)
             if (data.data.status !== "done") {
                 console.log("Sikertelen bejelentkezés. ", data.data.message);
-            } else {
+            }
+
+            else 
+            {
+                // Válaszból kiszedi a set-cookie-t.
                 const setCookieHeader = data.headers["set-cookie"][0];
 
-                if (setCookieHeader) {
+                if (setCookieHeader) 
+                {
                     const cookiesArray = setCookieHeader.split("; ");
+
+                    // Minden adat amit tárolnunk kell.
                     const authTokenValue = cookiesArray[0].split("=")[1];
                     const deviceIdValue = cookiesArray[5].split(", ")[1].split("=")[1];
 
-                    console.log(authTokenValue, deviceIdValue)
-
-
+                    // Ha van Token és eszköz ID.
                     if (authTokenValue && deviceIdValue) {
+                        // Elmenti a cookie-kat.
                         await AsyncStorage.setItem("authToken", authTokenValue);
                         await AsyncStorage.setItem("deviceId", deviceIdValue);
-
-                        console.log("Autentikációs Token elmentve: ", authTokenValue);
-                        console.log("Device ID  elmentve: ", deviceIdValue);
                     }
-                } else {
+                } 
+                else
+                {
                     console.error("A szükséges cookie-k nincsenek jelen a válaszban.");
                 }
-                console.log("Sikeres bejelentkezés!");
+
+                // Sikeres bejelentkezés esetén lefut a login függvény a cookie props-okkal.
                 login(await AsyncStorage.getItem('authToken'), await AsyncStorage.getItem('deviceId'));
             }
         } catch (err) {
@@ -69,7 +77,7 @@ const LoginScreen = ({ navigation }: any) => {
                     <InputField label={"Email ID"} icon={<Entypo name="mail" size={20} color={Colors.gray2} style={{ marginRight: 5 }} />} keyboardType="email-address" value={email} onChangeText={(text: string) => setEmail(text)} />
                     <InputField label={"Password"} icon={<AntDesign name="lock" size={20} color={Colors.gray2} style={{ marginRight: 5 }} />} inputType="password" fieldButtonLabel={"Forgot?"} fieldButtonFunction={() => {}} value={password} onChangeText={(text: string) => setPassword(text)} />
 
-                    <CustomButton label={"BELÉPÉS"} onPress={handleLogin} />
+                    <CustomButton label={isLoading? "Loading" :"BELÉPÉS"} onPress={handleLogin} />
 
                     <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                         <Text style={{ color: "white", fontWeight: "700" }}>Regisztráció</Text>
